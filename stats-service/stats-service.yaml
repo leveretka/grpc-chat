@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: stats-service
+  name: stats-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: stats-service
+  template:
+    metadata:
+      labels:
+        run: stats-service
+    spec:
+      containers:
+      - name: stats-service
+        image: gcr.io/vigilant-cider-216913/stats-service:v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: stats-service
+  name: stats-service
+spec:
+  ports:
+  - name: grpc
+    port: 50061
+    protocol: TCP
+    targetPort: 50061
+  selector:
+    run: stats-service
+  type: LoadBalancer

@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: chat-service
+  name: chat-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: chat-service
+  template:
+    metadata:
+      labels:
+        run: chat-service
+    spec:
+      containers:
+      - name: chat-service
+        image: gcr.io/vigilant-cider-216913/chat-service:v1
+        env:
+        - name: STATS_SERVICE_TARGET
+          value: dns:///stats-service:50061
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: chat-service
+  name: chat-service
+spec:
+  ports:
+  - name: grpc
+    port: 50051
+    protocol: TCP
+    targetPort: 50051
+  selector:
+    run: chat-service
+  type: LoadBalancer

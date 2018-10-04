@@ -1,0 +1,68 @@
+group 'ua.nedz.demo'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        kotlinVersion = '1.2.61'
+    }
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenLocal()
+        maven {
+            url 'https://marharyta.jfrog.io/marharyta/libs-snapshots-gradle'
+            credentials {
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.4"
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "com.jfrog.artifactory"
+
+def grpcVersion = '1.14.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile "com.google.api.grpc:proto-google-common-protos:1.0.0"
+    compile "io.grpc:grpc-netty:${grpcVersion}"
+    compile "io.grpc:grpc-protobuf:${grpcVersion}"
+    compile "io.grpc:grpc-stub:${grpcVersion}"
+    compile files ('../grpc-chat-api-1.0-SNAPSHOT.jar')
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'ua.nedz.demo.VoteServerKt'
+        )
+    }
+}

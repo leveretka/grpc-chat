@@ -5,13 +5,16 @@ import io.grpc.internal.DnsNameResolverProvider
 import io.grpc.stub.StreamObserver
 import io.grpc.util.RoundRobinLoadBalancerFactory
 import io.netty.util.internal.ConcurrentSet
+import kotlinx.coroutines.experimental.runBlocking
 import ua.nedz.grpc.ChatProto
 import ua.nedz.grpc.ChatServiceGrpc
 import ua.nedz.grpc.StatsProto
 import ua.nedz.grpc.StatsServiceGrpc
 
-class ChatServiceImpl: ChatServiceGrpc.ChatServiceImplBase() {
+
+class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
     var target: String? = System.getenv("STATS_SERVICE_TARGET")
+
     init {
         if (target.isNullOrEmpty()) {
             target = "localhost:50061"
@@ -33,20 +36,21 @@ class ChatServiceImpl: ChatServiceGrpc.ChatServiceImplBase() {
         // 3. When implementing second step add message to statistics
 
 
-
         clients.add(client)
         return object : StreamObserver<ChatProto.ChatMessage> {
-            override fun onNext(msg: ChatProto.ChatMessage) {
+            override fun onNext(msg: ChatProto.ChatMessage) = runBlocking {
                 println("${msg.from}: ${msg.content}")
-                clients.forEach { it.onNext(msg) }
+                clients.forEach { try { it.onNext(msg)} finally {
+                }}
 
-                if (msg.content.startsWith("gRPC is for")) {
-                    val record = StatsProto.Record.newBuilder()
+                if (msg.content.startsWith("gRPC")) {
+                    val record: StatsProto.Record = StatsProto.Record.newBuilder()
                             .setAuthor(msg.from)
                             .setContent(msg.content)
                             .build()
 
                     statsStub.addRecord(record)
+
                 }
             }
 

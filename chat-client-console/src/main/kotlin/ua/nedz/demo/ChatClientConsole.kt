@@ -1,0 +1,122 @@
+package ua.nedz.demo
+
+import io.javalin.Javalin
+
+fun main(args: Array<String>) {
+    val app = Javalin.create().start(7000)
+
+    app.get("/") {
+        it.result(messages.joinToString ("\n"))
+    }
+
+    val chatClient = ChatClient()
+    chatClient.chat {
+        messages.add("${it.from}: ${it.content}")
+    }
+    names.forEach { chatClient.addMessage(it, "Hello!") }
+}
+
+val messages = mutableListOf<String>()
+
+val names = listOf(
+        "Sophia",
+        "Jackson",
+        "Emma",
+        "Aiden",
+        "Olivia",
+        "Lucas",
+        "Ava",
+        "Liam",
+        "Mia",
+        "Noah",
+        "Isabella",
+        "Ethan",
+        "Riley",
+        "Mason",
+        "Aria",
+        "Caden",
+        "Zoe",
+        "Oliver",
+        "Charlotte",
+        "Elijah",
+        "Lily",
+        "Grayson",
+        "Layla",
+        "Jacob",
+        "Amelia",
+        "Michael",
+        "Emily",
+        "Benjamin",
+        "Madelyn",
+        "Carter",
+        "Aubrey",
+        "James",
+        "Adalyn",
+        "Jayden",
+        "Madison",
+        "Logan",
+        "Chloe",
+        "Alexander",
+        "Harper",
+        "Caleb",
+        "Abigail",
+        "Ryan",
+        "Aaliyah",
+        "Luke",
+        "Avery",
+        "Daniel",
+        "Evelyn",
+        "Jack",
+        "Kaylee",
+        "William",
+        "Ella",
+        "Owen",
+        "Ellie",
+        "Gabriel",
+        "Scarlett",
+        "Matthew",
+        "Arianna",
+        "Connor",
+        "Hailey",
+        "Jayce",
+        "Nora",
+        "Isaac",
+        "Addison",
+        "Sebastian",
+        "Brooklyn",
+        "Henry",
+        "Hannah",
+        "Muhammad",
+        "Mila",
+        "Cameron",
+        "Leah",
+        "Wyatt",
+        "Elizabeth",
+        "Dylan",
+        "Sarah",
+        "Nathan",
+        "Eliana",
+        "Nicholas",
+        "Mackenzie",
+        "Julian",
+        "Peyton",
+        "Eli",
+        "Maria",
+        "Levi",
+        "Grace",
+        "Isaiah",
+        "Adeline",
+        "Landon",
+        "Elena",
+        "David",
+        "Anna",
+        "Christian",
+        "Victoria",
+        "Andrew",
+        "Camilla",
+        "Brayden",
+        "Lillian",
+        "John",
+        "Natalie",
+        "Lincoln"
+)

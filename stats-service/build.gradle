@@ -47,7 +47,7 @@ dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
-    compile files ('../grpc-chat-api-1.0-SNAPSHOT.jar')
+    compile files ('grpc-chat-api-1.0-SNAPSHOT.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

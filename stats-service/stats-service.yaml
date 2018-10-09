@@ -5,7 +5,7 @@ metadata:
     run: stats-service
   name: stats-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       run: stats-service

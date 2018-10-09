@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "ua.nedz.grpc";
+option java_outer_classname = "ChatProto";
+option objc_class_prefix = "CP";
+
+package chat;
+
+service ChatService {
+    rpc chat (stream ChatMessage) returns (stream ChatMessage) {}
+}
+
+message ChatMessage {
+    string from = 1;
+    string content = 2;
+}

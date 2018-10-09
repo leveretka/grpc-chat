@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "ua.nedz.grpc";
+option java_outer_classname = "VoteProto";
+option objc_class_prefix = "VP";
+
+package stats;
+
+service VoteService {
+    rpc vote (VoteRequest) returns (VoteResponse) {}
+}
+
+message VoteResponse {
+    bool result = 1;
+}
+
+message VoteRequest {
+    int64 recordId = 1;
+    string voterName = 2;
+}
+

@@ -9,13 +9,13 @@ fun main(args: Array<String>) {
     server.blockUntilShutdown()
 }
 
-class ChatServer {
-    private lateinit var server: Server
+class ChatServer (val port: Int = 50051, val serverBuilder: ServerBuilder<*> = ServerBuilder.forPort(port)) {
+    lateinit var server: Server
 
     fun start() {
-        val port = 50051
-        server = ServerBuilder.forPort(port)
+        server = serverBuilder
                 .addService(ChatServiceImpl())
+                //.addService(ManualFlowChatServiceImpl())
                 .build()
                 .start()
         println("Server started!")
@@ -27,5 +27,10 @@ class ChatServer {
     @Throws(InterruptedException::class)
     fun blockUntilShutdown() {
         server.awaitTermination()
+    }
+
+    fun stop() {
+        if (::server.isInitialized)
+            server.shutdown()
     }
 }

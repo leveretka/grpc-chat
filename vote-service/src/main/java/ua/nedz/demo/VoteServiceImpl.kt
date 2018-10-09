@@ -18,6 +18,7 @@ class VoteServiceImpl : VoteServiceGrpc.VoteServiceImplBase() {
     private var statsChannel: ManagedChannel
     private val votes = ConcurrentHashMap<String, MutableList<Long>>()
     var target: String? = System.getenv("STATS_SERVICE_TARGET")
+
     init {
         if (target.isNullOrEmpty()) {
             target = "localhost:50061"
@@ -35,7 +36,7 @@ class VoteServiceImpl : VoteServiceGrpc.VoteServiceImplBase() {
     private val statsStub = StatsServiceGrpc.newFutureStub(statsChannel)
 
 
-    override fun vote(request: VoteProto.VoteRequest, responseObserver: StreamObserver<VoteProto.VoteResponse>?) {
+    override fun vote(request: VoteProto.VoteRequest, responseObserver: StreamObserver<VoteProto.VoteResponse>) {
         votes.putIfAbsent(request.voterName, mutableListOf())
         val userVotes = votes[request.voterName]!!
         val firstVoted = !userVotes.contains(request.recordId)
@@ -44,10 +45,12 @@ class VoteServiceImpl : VoteServiceGrpc.VoteServiceImplBase() {
                     .setRecordId(request.recordId)
                     .setVoterName(request.voterName)
                     .build()
+
             statsStub.addVote(addVoteRequest)
-            userVotes.add(request.recordId)
         }
         val response = VoteProto.VoteResponse.newBuilder().setResult(firstVoted).build()
-        responseObserver?.onNext(response)
+        userVotes.add(request.recordId)
+        responseObserver.onNext(response)
     }
+
 }

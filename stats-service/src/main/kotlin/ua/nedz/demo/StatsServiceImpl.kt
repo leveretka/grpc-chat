@@ -20,7 +20,7 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         notifyClients(responseObserver)
     }
 
-    override fun addRecord(request: StatsProto.Record, responseObserver: StreamObserver<StatsProto.AddRecordResponse>?) {
+    override fun addRecord(request: StatsProto.Record, responseObserver: StreamObserver<StatsProto.AddRecordResponse>) {
         // 1. Add id to a new record
         // 2. Put record in map with key id
         // 3. Put record in votes with 0 value
@@ -30,6 +30,10 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         records[record.id] = record
         votes[record.id] = AtomicLong(0L)
         notifyClients(*listeners.toTypedArray())
+        responseObserver.onNext(StatsProto.AddRecordResponse
+                .newBuilder()
+                .setResult(true)
+                .build())
     }
 
     override fun addVote(request: StatsProto.AddVoteRequest, responseObserver: StreamObserver<StatsProto.Record>) {
@@ -38,10 +42,18 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         // 3. Increment votes
         // 4. Notify all clients
 
-        val record = records[request.recordId]!!
-        if (record.author != request.voterName)
-            votes[record.id]?.incrementAndGet()
-        notifyClients(*listeners.toTypedArray())
+        val record = records[request.recordId]
+        record?.let {
+            if (record.author != request.voterName)
+                votes[record.id]?.incrementAndGet()
+
+            responseObserver.onNext(StatsProto.Record.newBuilder()
+                    .setId(it.id)
+                    .setAuthor(it.author)
+                    .setContent(it.content)
+                    .build())
+            notifyClients(*listeners.toTypedArray())
+        }
     }
 
     private fun notifyClients(vararg clients: StreamObserver<StatsProto.Statistics>) {
@@ -54,7 +66,12 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
                             .setContent(r.content)
                             .setVotes(votes[id]?.get() ?: 0L))
         }
-        clients.forEach { l -> l.onNext(builder.build()) }
+        clients.forEach {
+            try {
+                it.onNext(builder.build())
+            } finally {
+            }
+        }
     }
 
     data class Record(val id: Long, val author: String, val content: String)

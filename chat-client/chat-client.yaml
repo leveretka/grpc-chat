@@ -5,7 +5,7 @@ metadata:
     run: chat-client
   name: chat-client
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       run: chat-client
@@ -14,16 +14,9 @@ spec:
       labels:
         run: chat-client
     spec:
-      volumes:
-      - name: secret-volume
-        secret:
-          secretName: nginxsecret
       containers:
       - name: chat-client
         image: gcr.io/vigilant-cider-216913/chat-client:v1
-        volumeMounts:
-        - mountPath: /etc/nginx/ssl
-          name: secret-volume
         env:
         - name: STATS_SERVICE_TARGET
           value: dns:///stats-service:50061
@@ -45,10 +38,7 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: 8080
-  - name: https
-    port: 443
-    protocol: TCP
-    targetPort: 8080
   selector:
     run: chat-client
   type: LoadBalancer
+  loadBalancerIP: "104.197.77.39"

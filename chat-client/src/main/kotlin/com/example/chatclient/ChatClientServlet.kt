@@ -10,5 +10,5 @@ import javax.servlet.annotation.WebServlet
         asyncSupported = true,
         loadOnStartup = 1,
 
-        initParams = [WebInitParam(name="ui", value="com.example.chatclient.ChatClientUI")])
+        initParams = [WebInitParam(name="ui", value="com.example.chatclient.MainUI")])
 class ChatClientServlet : com.vaadin.server.VaadinServlet()

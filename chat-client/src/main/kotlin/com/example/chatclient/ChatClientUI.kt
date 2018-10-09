@@ -10,7 +10,7 @@ import ua.nedz.grpc.ChatProto
 
 
 @Theme("ChatClient")
-@Push(PushMode.AUTOMATIC)
+@Push
 @PreserveOnRefresh
 class ChatClientUI : UI() {
 
@@ -78,7 +78,7 @@ class ChatClientUI : UI() {
                     .setFrom(nameValue)
                     .setContent(messageValue)
                     .build())
-//            chatClient.addMessage(nameValue, messageValue)
+            chatClient.addMessage(nameValue, messageValue)
         }
 
     }

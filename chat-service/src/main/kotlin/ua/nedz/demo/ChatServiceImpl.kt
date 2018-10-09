@@ -5,7 +5,6 @@ import io.grpc.internal.DnsNameResolverProvider
 import io.grpc.stub.StreamObserver
 import io.grpc.util.RoundRobinLoadBalancerFactory
 import io.netty.util.internal.ConcurrentSet
-import kotlinx.coroutines.experimental.runBlocking
 import ua.nedz.grpc.ChatProto
 import ua.nedz.grpc.ChatServiceGrpc
 import ua.nedz.grpc.StatsProto
@@ -20,6 +19,7 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
             target = "localhost:50061"
         }
     }
+
 
     private val clients = ConcurrentSet<StreamObserver<ChatProto.ChatMessage>>()
     private val statsChannel = ManagedChannelBuilder
@@ -38,10 +38,9 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
 
         clients.add(client)
         return object : StreamObserver<ChatProto.ChatMessage> {
-            override fun onNext(msg: ChatProto.ChatMessage) = runBlocking {
+            override fun onNext(msg: ChatProto.ChatMessage) {
                 println("${msg.from}: ${msg.content}")
-                clients.forEach { try { it.onNext(msg)} finally {
-                }}
+                clients.forEach { try { it.onNext(msg)} finally { }}
 
                 if (msg.content.startsWith("gRPC")) {
                     val record: StatsProto.Record = StatsProto.Record.newBuilder()
@@ -61,5 +60,7 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
         }
     }
 
+    private fun notifyClient(client: StreamObserver<ChatProto.ChatMessage>, vararg messages: ChatProto.ChatMessage)
+            = messages.forEach { client.onNext(it) }
 
 }

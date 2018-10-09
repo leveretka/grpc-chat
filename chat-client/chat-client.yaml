@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: chat-client
-        image: gcr.io/vigilant-cider-216913/chat-client:v1
+        image: gcr.io/vigilant-cider-216913/chat-client:v2.1
         env:
         - name: STATS_SERVICE_TARGET
           value: dns:///stats-service:50061

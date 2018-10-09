@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vote-service
-        image: gcr.io/vigilant-cider-216913/vote-service:v1
+        image: gcr.io/vigilant-cider-216913/vote-service:v2
         env:
         - name: STATS_SERVICE_TARGET
           value: dns:///stats-service:50061

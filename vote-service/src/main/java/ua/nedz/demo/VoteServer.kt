@@ -18,6 +18,7 @@ class VoteServer {
                 .addService(VoteServiceImpl())
                 .build()
                 .start()
+        println("Server started!")
     }
 
     /**

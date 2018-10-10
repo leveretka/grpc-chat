@@ -1,5 +1,6 @@
 package ua.nedz.demo
 
+import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import ua.nedz.grpc.StatsProto
 import ua.nedz.grpc.StatsServiceGrpc
@@ -25,6 +26,7 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         // 2. Put record in map with key id
         // 3. Put record in votes with 0 value
         // 4. Notify all clients
+        // 5. Return result
 
         val record = Record(counter.incrementAndGet(), request.author, request.content)
         records[record.id] = record
@@ -69,7 +71,7 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         clients.forEach {
             try {
                 it.onNext(builder.build())
-            } finally {
+            } catch (e: StatusRuntimeException) {
             }
         }
     }

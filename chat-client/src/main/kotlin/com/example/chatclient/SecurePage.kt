@@ -1,11 +1,10 @@
 package com.example.chatclient
 
 import com.vaadin.navigator.View
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent
 import com.vaadin.server.VaadinSession
 import com.vaadin.ui.*
 import ua.nedz.grpc.ChatProto
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent
-import com.vaadin.server.Sizeable
 
 
 class SecurePage : VerticalLayout(), View {
@@ -15,7 +14,6 @@ class SecurePage : VerticalLayout(), View {
 
     private val mainLayout = Accordion()
     private val chatLayout = VerticalLayout()
-    private val voteLayout = VerticalLayout()
     private var votingLayout =  GridLayout(4, 1)
     private val message = TextField()
     private val button = Button("Send")
@@ -74,10 +72,6 @@ class SecurePage : VerticalLayout(), View {
                     val voteBtn = Button("+")
                     voteBtn.addClickListener { chatClient.vote(record.id, userName) }
                     votingLayout.addComponents(author, content, votes, voteBtn)
-//                    mainLayout.addTab(votingLayout)
-//                    val recordLayout = HorizontalLayout()
-//                    recordLayout.addComponents(author, content, votes, voteBtn)
-//                    voteLayout.addComponent(recordLayout)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package ua.nedz.demo
 
 import io.grpc.ManagedChannelBuilder
+import io.grpc.StatusRuntimeException
 import io.grpc.internal.DnsNameResolverProvider
 import io.grpc.stub.StreamObserver
 import io.grpc.util.RoundRobinLoadBalancerFactory
@@ -12,7 +13,7 @@ import ua.nedz.grpc.StatsServiceGrpc
 
 
 class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
-    var target: String? = System.getenv("STATS_SERVICE_TARGET")
+    private var target: String? = System.getenv("STATS_SERVICE_TARGET")
 
     init {
         if (target.isNullOrEmpty()) {
@@ -28,6 +29,7 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
             .loadBalancerFactory(RoundRobinLoadBalancerFactory.getInstance())
             .usePlaintext(true)
             .build()
+
     private val statsStub = StatsServiceGrpc.newFutureStub(statsChannel)
 
     override fun chat(client: StreamObserver<ChatProto.ChatMessage>): StreamObserver<ChatProto.ChatMessage> {
@@ -40,7 +42,7 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
         return object : StreamObserver<ChatProto.ChatMessage> {
             override fun onNext(msg: ChatProto.ChatMessage) {
                 println("${msg.from}: ${msg.content}")
-                clients.forEach { try { it.onNext(msg)} finally { }}
+                clients.forEach { try { it.onNext(msg)} catch (e: StatusRuntimeException) { }}
 
                 if (msg.content.startsWith("gRPC")) {
                     val record: StatsProto.Record = StatsProto.Record.newBuilder()
@@ -56,11 +58,6 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
             override fun onCompleted() {}
 
             override fun onError(t: Throwable?) {}
-
         }
     }
-
-    private fun notifyClient(client: StreamObserver<ChatProto.ChatMessage>, vararg messages: ChatProto.ChatMessage)
-            = messages.forEach { client.onNext(it) }
-
 }

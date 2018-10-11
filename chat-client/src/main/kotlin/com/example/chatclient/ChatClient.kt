@@ -7,6 +7,7 @@ import io.grpc.stub.ClientResponseObserver
 import io.grpc.stub.StreamObserver
 import io.grpc.util.RoundRobinLoadBalancerFactory
 import ua.nedz.grpc.*
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class ChatClient {
@@ -87,17 +88,17 @@ class ChatClient {
                 override fun onCompleted() {}
             }
 
-    private fun clientResponseObserver(action: (ChatProto.ChatMessage) -> Unit) =
-            object : ClientResponseObserver<ChatProto.ChatMessage, ChatProto.ChatMessage> {
+    private fun <T>clientResponseObserver(messages: Queue<T>, action: (T) -> Unit) =
+            object : ClientResponseObserver<T, T> {
         override fun onError(t: Throwable?) {
             t?.printStackTrace()
         }
 
         override fun onCompleted() {}
 
-        lateinit var requestStream: ClientCallStreamObserver<ChatProto.ChatMessage>
+        lateinit var requestStream: ClientCallStreamObserver<T>
 
-        override fun beforeStart(stream: ClientCallStreamObserver<ChatProto.ChatMessage>) {
+        override fun beforeStart(stream: ClientCallStreamObserver<T>) {
             this.requestStream = stream
             this.requestStream.disableAutoInboundFlowControl()
 
@@ -111,7 +112,7 @@ class ChatClient {
             }
         }
 
-        override fun onNext(value: ChatProto.ChatMessage) {
+        override fun onNext(value: T) {
             action(value)
             requestStream.request(1)
         }

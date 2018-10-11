@@ -73,11 +73,11 @@ class ChatClientUI : UI() {
         button.addClickListener {
             val nameValue = name.value
             val messageValue = message.value
-            observer.onNext(ChatProto.ChatMessage
-                    .newBuilder()
-                    .setFrom(nameValue)
-                    .setContent(messageValue)
-                    .build())
+//            observer.onNext(ChatProto.ChatMessage
+//                    .newBuilder()
+//                    .setFrom(nameValue)
+//                    .setContent(messageValue)
+//                    .build())
             chatClient.addMessage(nameValue, messageValue)
         }
 

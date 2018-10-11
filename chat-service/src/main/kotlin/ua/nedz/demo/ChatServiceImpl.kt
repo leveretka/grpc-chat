@@ -21,7 +21,6 @@ class ChatServiceImpl : ChatServiceGrpc.ChatServiceImplBase() {
         }
     }
 
-
     private val clients = ConcurrentSet<StreamObserver<ChatProto.ChatMessage>>()
     private val statsChannel = ManagedChannelBuilder
             .forTarget(target)

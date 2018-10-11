@@ -71,8 +71,7 @@ class StatsServiceImpl : StatsServiceGrpc.StatsServiceImplBase() {
         clients.forEach {
             try {
                 it.onNext(builder.build())
-            } catch (e: StatusRuntimeException) {
-            }
+            } catch (e: StatusRuntimeException) { }
         }
     }
 

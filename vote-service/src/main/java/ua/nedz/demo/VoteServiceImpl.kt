@@ -37,6 +37,12 @@ class VoteServiceImpl : VoteServiceGrpc.VoteServiceImplBase() {
 
 
     override fun vote(request: VoteProto.VoteRequest, responseObserver: StreamObserver<VoteProto.VoteResponse>) {
+        //1. Put if client is absent in votes map
+        //2. Check if user already voted for this message
+        //3. Update statistics via stats server
+        //4. Return result
+
+
         votes.putIfAbsent(request.voterName, mutableListOf())
         val userVotes = votes[request.voterName]!!
         val firstVoted = !userVotes.contains(request.recordId)

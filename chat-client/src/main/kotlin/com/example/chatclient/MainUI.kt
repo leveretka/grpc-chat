@@ -25,11 +25,13 @@ class MainUI : UI() {
 
     private fun router(route: String) {
         Notification.show(route)
-        if (session.getAttribute("user") != null) {
-            navigator.addView(SecurePage.NAME, SecurePage::class.java)
-            navigator.navigateTo(SecurePage.NAME)
-        } else {
-            navigator.navigateTo(LoginPage.NAME)
+        navigator.run {
+            if (session.getAttribute("user") != null) {
+                addView(SecurePage.NAME, SecurePage::class.java)
+                navigateTo(SecurePage.NAME)
+            } else {
+                navigateTo(LoginPage.NAME)
+            }
         }
     }
 
